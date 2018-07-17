@@ -21,8 +21,8 @@ let currentPlayerTurn = PLAYER.ONE;
 let stack = [];
 
 function Domino(sideA, sideB) {
-    this.sideA = { value: sideA, next: null, parent: this };
-    this.sideB = { value: sideB, next: null, parent: this };
+    this.sideA = { value: sideA, next: null };
+    this.sideB = { value: sideB, next: null };
 
     // Assign the reference to the other side of the tile.
     this.sideA.otherSide = this.sideB;
