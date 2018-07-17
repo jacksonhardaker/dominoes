@@ -143,7 +143,7 @@ function placeTile(tile, player) {
 }
 
 function displayBoard() {
-    console.log(`Board is now: ${traverseAndStringifyTiles(board.left)}`);
+    console.log(`Board is now: ${traverseAndStringifyTiles(board.left)}`.trim());
 }
 
 function traverseAndStringifyTiles(tileSide) {
