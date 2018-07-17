@@ -1,0 +1,19 @@
+{
+  "name": "dominoes",
+  "version": "1.0.0",
+  "description": "Simulates a game of Dominoes",
+  "main": "dominoes.js",
+  "scripts": {
+    "test": "node dominoes.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacksonhardaker/dominoes.git"
+  },
+  "author": "Jackson Hardaker",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacksonhardaker/dominoes/issues"
+  },
+  "homepage": "https://github.com/jacksonhardaker/dominoes#readme"
+}
