@@ -102,6 +102,7 @@ function gameSetup() {
     console.log(`Game starting with first tile: <${board.left.value}:${board.right.value}>`);
 }
 
+
 function drawTile(player, number) {
     const tiles = stack.splice(stack.length - number);
 
