@@ -103,14 +103,11 @@ function gameSetup() {
 }
 
 function drawTile(player, number) {
-    const tiles = [];
-
-    for (let i = 1; i <= number; i++) {
-        tiles.push(stack.pop());
-    }
+    const tiles = stack.splice(stack.length - number);
 
     players[player].tiles = [...players[player].tiles, ...tiles];
 
+    // Return either an array of all tiles drawn (if many) or the sigle tile (if one)
     return number === 1 ? tiles[0] : [...tiles];
 }
 
