@@ -147,11 +147,7 @@ function displayBoard() {
 }
 
 function traverseAndStringifyTiles(tileSide) {
-    if (tileSide) {
-        return `<${tileSide.value}:${tileSide.otherSide.value}> ${traverseAndStringifyTiles(tileSide.otherSide.next)}`;
-    }
-
-    return '';
+    return tileSide ? `<${tileSide.value}:${tileSide.otherSide.value}> ${traverseAndStringifyTiles(tileSide.otherSide.next)}` : '';
 }
 
 module.exports = { play };
