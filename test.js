@@ -1,3 +1,3 @@
-let game = require('./dominoes');
+const game = require('./dominoes');
 
 game.play();
