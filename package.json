@@ -4,7 +4,7 @@
   "description": "Simulates a game of Dominoes",
   "main": "dominoes.js",
   "scripts": {
-    "test": "node dominoes.js"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
