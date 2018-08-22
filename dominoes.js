@@ -12,25 +12,49 @@ const players = {
         tiles: []
     }
 };
+
+// Define the board, keeping track of the left most side (of a domino) and the right most side (of a domino).
+// When initialised, left and right will be two sides of the same domino piece.
 const board = {
     left: null,
     right: null
 }
 
+// Game starts with player ones turn. And an empty stack.
 let currentPlayerTurn = PLAYER.ONE;
 let stack = [];
 
+/**
+ * Define a Domino object. This has two sides, with a number at each side.
+ * It has no specific orientation: The numbers can be read left-to-right or right-to-left
+ *
+ * @param {Number} sideA
+ * @param {Number} sideB
+ */
 function Domino(sideA, sideB) {
     this.sideA = { value: sideA, next: null };
     this.sideB = { value: sideB, next: null };
 
-    // Assign the reference to the other side of the tile.
+    // Assign the reference to the other side of the tile. Allows us to traverse the domino without knowing the orientation.
     this.sideA.otherSide = this.sideB;
     this.sideB.otherSide = this.sideA;
 }
+Domino.prototype.leftToRightString = function() {
+    return `<${this.sideA.value}:${this.sideB.value}>`
+}
+Domino.prototype.rightToLeftString = function() {
+    return `<${this.sideB.value}:${this.sideA.value}>`
+}
 
+/**
+ * Starts the automatated game of dominos.
+ *
+ */
 function play() {
+
+    // Reset stack.
     stack = [];
+
     createShuffledStack();
 
     // Draw hands
@@ -40,6 +64,7 @@ function play() {
     // Start board.
     gameSetup();
 
+    // Game continues indefinitely until a player wins or until there is a draw. In either instance, the loop will be broken.
     while (true) {
 
         let currentPlayer = players[currentPlayerTurn];
@@ -70,6 +95,7 @@ function play() {
             console.log(`${currentPlayer.name} can't play, drawing tile <${tile.sideA.value}:${tile.sideB.value}>`)
 
             if (stack.length === 0) {
+
                 // GAME OVER the game is a draw
                 console.log('The game was a draw!');
                 break;
@@ -81,7 +107,13 @@ function play() {
     }
 }
 
+/**
+ * Creates a stack of dominos, and then shuffles them using the Fisher–Yates shuffle algorithm.
+ *
+ */
 function createShuffledStack() {
+
+    // Create set of dominos
     for (let i = 0; i < 7; i++) {
         for (let j = 0; j <= i; j++) {
             stack.push(new Domino(i, j));
@@ -95,6 +127,10 @@ function createShuffledStack() {
     }
 }
 
+/**
+ * Setup the initial game board by taking the top tile from the stack and placing it on the board.
+ *
+ */
 function gameSetup() {
     let tile = stack.pop();
     board.left = tile.sideA;
@@ -103,47 +139,112 @@ function gameSetup() {
 }
 
 
+/**
+ * Draws any number of dominos from the stack into a players hand.
+ *
+ * @param {String} player PLAYER_ONE or PLAYER_TWO from the PLAYER const
+ * @param {Number} number of tiles to draw
+ * @returns {Array or Domino} either an array of all tiles drawn (if many) or the sigle tile (if one)
+ */
 function drawTile(player, number) {
     const tiles = stack.splice(stack.length - number);
 
+    // Add to the players tiles.
     players[player].tiles = [...players[player].tiles, ...tiles];
 
     // Return either an array of all tiles drawn (if many) or the sigle tile (if one)
     return number === 1 ? tiles[0] : [...tiles];
 }
 
+/**
+ * Automatically places a tile based on the current board.
+ * It can either go to the left or right of the board and can be placed left-to-right or right-to-left.
+ *
+ * @param {Domino} tile
+ * @param {String} player PLAYER_ONE or PLAYER_TWO from the PLAYER const
+ */
 function placeTile(tile, player) {
     if (tile.sideA.value === board.left.value) { // Place to the left
         board.left.next = tile.sideA;
         tile.sideA.next = board.left;
-        console.log(`${player.name} plays <${tile.sideB.value}:${tile.sideA.value}> to connect to tile <${board.left.value}:${board.left.otherSide.value}> on the board`);
-        board.left = tile.sideB;
+
+        displayLeftPlacement(player.name, tile.rightToLeftString());
+        
+        board.left = tile.sideB; // The opposite side of the domino is now the left most number.
     }
     else if (tile.sideB.value === board.left.value) { // Place to the left, flipped
         board.left.next = tile.sideB;
         tile.sideB.next = board.left;
-        console.log(`${player.name} plays <${tile.sideA.value}:${tile.sideB.value}> to connect to tile <${board.left.value}:${board.left.otherSide.value}> on the board`);
-        board.left = tile.sideA;
+        
+        displayLeftPlacement(player.name, tile.leftToRightString());
+
+        board.left = tile.sideA; // The opposite side of the domino is now the left most number.
 
     }
     else if (tile.sideA.value === board.right.value) { // Place to the right
         board.right.next = tile.sideA;
         tile.sideA.next = board.right;
-        console.log(`${player.name} plays <${tile.sideA.value}:${tile.sideB.value}> to connect to tile <${board.right.otherSide.value}:${board.right.value}> on the board`);
-        board.right = tile.sideB;
+        
+        displayRightPlacement(player.name, tile.leftToRightString());
+        
+        board.right = tile.sideB; // The opposite side of the domino is now the right most number.
     }
     else if (tile.sideB.value === board.right.value) { // Place to the right, flipped
         board.right.next = tile.sideB;
         tile.sideB.next = board.right;
-        console.log(`${player.name} plays <${tile.sideB.value}:${tile.sideA.value}> to connect to tile <${board.right.otherSide.value}:${board.right.value}> on the board`);
-        board.right = tile.sideA;
+        
+        displayRightPlacement(player.name, tile.rightToLeftString());
+
+        board.right = tile.sideA; // The opposite side of the domino is now the right most number.
     }
 }
 
+/**
+ * Calls displayMove with the given player and tile, when the tile is being placed on the right.
+ *
+ * @param {String} playerName
+ * @param {String} dominoString
+ */
+function displayRightPlacement(playerName, dominoString) {
+    displayMove(playerName, dominoString, `<${board.right.otherSide.value}:${board.right.value}>`);
+    
+}
+
+/**
+ * Calls displayMove with the given player and tile, when the tile is being placed on the left.
+ *
+ * @param {String} playerName
+ * @param {String} dominoString
+ */
+function displayLeftPlacement(playerName, dominoString) {
+    displayMove(playerName, dominoString, `<${board.left.value}:${board.left.otherSide.value}>`);
+}
+
+/**
+ * Displays a players move with the given tile, being placed on the given side.
+ *
+ * @param {String} playerName
+ * @param {String} dominoString
+ * @param {String} side
+ */
+function displayMove(playerName, dominoString, side) {
+    console.log(`${playerName} plays ${dominoString} to connect to tile ${side} on the board`);
+}
+
+/**
+ * Displays the existing board by traversing, left-to-right, the connected tiles.
+ *
+ */
 function displayBoard() {
     console.log(`Board is now: ${traverseAndStringifyTiles(board.left)}`.trim());
 }
 
+/**
+ * Traverse the tiles starting from the given side of a tile.
+ *
+ * @param {Object} tileSide
+ * @returns {String} A fully traversed board.
+ */
 function traverseAndStringifyTiles(tileSide) {
     return tileSide ? `<${tileSide.value}:${tileSide.otherSide.value}> ${traverseAndStringifyTiles(tileSide.otherSide.next)}` : '';
 }
